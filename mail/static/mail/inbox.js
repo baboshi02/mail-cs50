@@ -31,6 +31,22 @@ function load_mailbox(mailbox) {
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
+  //showing the email
+  fetch(`/emails/${mailbox}`).then(response=>response.json()).then(result=>{
+    console.log(result);
+    result.forEach(email=>{
+      const element=document.createElement("div");
+      //checking if email is read or not
+      if(email.read){
+        element.style.backgroundColor="Grey";
+      }
+      else{
+        element.style.backgroundColor="black";
+      }
+      element.innerHTML=`Sender: ${email.sender} Subject: ${email.subject} timeStamp: ${email.timestamp} ` ;
+      document.querySelector("#emails-view").append(element)
+    });
+  });
 }
 
 //function for submitting the mail
