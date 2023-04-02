@@ -5,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.querySelector('#sent').addEventListener('click', () => load_mailbox('sent'));
   document.querySelector('#archived').addEventListener('click', () => load_mailbox('archive'));
   document.querySelector('#compose').addEventListener('click', compose_email);
+  //Used to compose an email
   document.querySelector("#compose-form").onsubmit=compose;
 
   // By default, load the inbox
@@ -16,7 +17,7 @@ function compose_email() {
   // Show compose view and hide other views
   document.querySelector('#emails-view').style.display = 'none';
   document.querySelector('#compose-view').style.display = 'block';
-
+  document.querySelector("#email-content").style.display='none';
   // Clear out composition fields
   document.querySelector('#compose-recipients').value = '';
   document.querySelector('#compose-subject').value = '';
@@ -28,6 +29,7 @@ function load_mailbox(mailbox) {
   // Show the mailbox and hide other views
   document.querySelector('#emails-view').style.display = 'block';
   document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector("#email-content").style.display='none';
 
   // Show the mailbox name
   document.querySelector('#emails-view').innerHTML = `<h3>${mailbox.charAt(0).toUpperCase() + mailbox.slice(1)}</h3>`;
@@ -43,8 +45,22 @@ function load_mailbox(mailbox) {
       else{
         element.style.backgroundColor="black";
       }
+      //entering the html
       element.innerHTML=`Sender: ${email.sender} Subject: ${email.subject} timeStamp: ${email.timestamp} ` ;
-      document.querySelector("#emails-view").append(element)
+      document.querySelector("#emails-view").append(element);
+      element.addEventListener("click",()=>{
+        console.log(email);
+        email_content(email.id);
+        fetch(`/emails/${email.id}`, {
+          method: 'PUT',
+          body: JSON.stringify({
+              read: true
+          })
+        })
+        
+        
+    }
+      )
     });
   });
 }
@@ -63,4 +79,20 @@ function compose(){
     })
   }).then(response=>response.json()).then(result=>console.log(result));
   return false;
+}
+
+function email_content(x){
+  document.querySelector('#emails-view').style.display = 'none';
+  document.querySelector('#compose-view').style.display = 'none';
+  document.querySelector("#email-content").style.display='block';
+   fetch(`emails/${x}`).then(response=>response.json()).then(data=>{
+    console.log(data);
+    let sender=data.sender;
+    let recipient=data.recipients;
+    let subject=data.subject;
+    let timeStamp=data.timestamp;
+    let body=data.body;
+    document.querySelector("#email-content").innerHTML=`<h1>From: ${sender} to ${recipient}</h1><br><h2>Subject :${subject} Timestamp : ${timeStamp}</h2><br>${body}`
+   })
+ 
 }
