@@ -103,6 +103,8 @@ function email_content(x){
     let subject=data.subject;
     let timeStamp=data.timestamp;
     let body=data.body;
+   
+    //Transforming data to html form
     document.querySelector("#email-content").innerHTML=`<h1>From: ${sender} to ${recipient}</h1><br><h2>Subject :${subject} Timestamp : ${timeStamp}</h2><br>${body}<br>`
     //adding archive button
     console.log(data.archived)
@@ -142,6 +144,19 @@ function email_content(x){
     }
     
   }
+   //adding reply button
+  let reply_button=document.createElement("button");
+  reply_button.innerHTML="Reply";
+  reply_button.onclick=()=>{
+    compose_email();
+    document.querySelector('#compose-recipients').value = sender;
+    document.querySelector('#compose-subject').value = `RE: ${subject}`;
+    document.querySelector('#compose-body').value =  `On ${timeStamp} ${sender} wrote: `;
+
+  
+  };
+  document.querySelector("#email-content").append(reply_button);
+  
   })
 
 }
